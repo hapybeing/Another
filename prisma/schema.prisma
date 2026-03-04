@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model ready for Authentication (NextAuth)
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // A user can have many monitors
+  monitors      Monitor[]
+}
+
+// The core SaaS feature: Endpoints being monitored
+model Monitor {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String   // e.g., "Production Database"
+  url       String   // e.g., "https://api.example.com/health"
+  status    String   @default("Operational") // Operational, Warning, Critical
+  method    String   @default("GET")
+  ping      Int?     // Response time in ms
+  uptime    Float    @default(100.0) // Percentage
+  
+  lastCheck DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
