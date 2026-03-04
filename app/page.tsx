@@ -1,6 +1,9 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 py-24 sm:py-32 lg:px-8 bg-grid-pattern">
+      {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neutral-900/40 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-2xl text-center">
@@ -18,8 +21,18 @@ export default function Home() {
           Real-time infrastructure monitoring, uptime tracking, and attack surface mapping. 
           Built for teams who need to know before the customer does.
         </p>
+        
+        <div className="mt-10 flex items-center justify-center gap-x-6">
+          <button className="rounded-md bg-white px-6 py-3 text-sm font-semibold text-black shadow-sm hover:bg-neutral-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all">
+            Start Monitoring
+          </button>
+          <Link href="/dashboard" className="text-sm font-semibold leading-6 text-neutral-300 hover:text-white transition-colors">
+            View the Dashboard <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </div>
 
+      {/* Mock UI Element */}
       <div className="relative z-10 mt-20 w-full max-w-5xl rounded-xl border border-neutral-800 bg-black/40 p-4 backdrop-blur-md shadow-2xl">
         <div className="flex items-center gap-2 mb-4 border-b border-neutral-800 pb-4">
           <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
