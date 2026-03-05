@@ -43,18 +43,24 @@ model VerificationToken {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                     String    @id @default(cuid())
+  name                   String?
+  email                  String?   @unique
+  emailVerified          DateTime?
+  image                  String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
   
-  accounts      Account[]
-  sessions      Session[]
-  monitors      Monitor[]
-  apiKeys       ApiKey[]  // NEW: Relation to API Keys
+  // NEW: STRIPE BILLING INFRASTRUCTURE
+  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
+  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
+  stripePriceId          String?   @map(name: "stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+  
+  accounts               Account[]
+  sessions               Session[]
+  monitors               Monitor[]
+  apiKeys                ApiKey[]  
 }
 
 model Monitor {
@@ -89,11 +95,10 @@ model PingLog {
   @@index([monitorId])
 }
 
-// NEW: API Key Storage for programmatic access
 model ApiKey {
   id        String   @id @default(cuid())
   userId    String
-  name      String   // e.g., "GitHub Actions CI"
+  name      String   
   key       String   @unique
   createdAt DateTime @default(now())
   lastUsed  DateTime?
