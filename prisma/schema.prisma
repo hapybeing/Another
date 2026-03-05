@@ -7,7 +7,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model ready for Authentication (NextAuth)
+// --- NEXTAUTH REQUIRED TABLES ---
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- CORE APPLICATION TABLES ---
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -17,20 +53,20 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
-  // A user can have many monitors
+  accounts      Account[]
+  sessions      Session[]
   monitors      Monitor[]
 }
 
-// The core SaaS feature: Endpoints being monitored
 model Monitor {
   id        String   @id @default(cuid())
   userId    String
-  name      String   // e.g., "Production Database"
-  url       String   // e.g., "https://api.example.com/health"
-  status    String   @default("Operational") // Operational, Warning, Critical
+  name      String   
+  url       String   
+  status    String   @default("Operational") 
   method    String   @default("GET")
-  ping      Int?     // Response time in ms
-  uptime    Float    @default(100.0) // Percentage
+  ping      Int?     
+  uptime    Float    @default(100.0) 
   
   lastCheck DateTime @default(now())
   createdAt DateTime @default(now())
