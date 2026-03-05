@@ -20,9 +20,7 @@ model Account {
   scope              String?
   id_token           String?  @db.Text
   session_state      String?
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@unique([provider, providerAccountId])
 }
 
@@ -38,7 +36,6 @@ model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
-
   @@unique([identifier, token])
 }
 
@@ -51,7 +48,6 @@ model User {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   
-  // NEW: STRIPE BILLING INFRASTRUCTURE
   stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
   stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
   stripePriceId          String?   @map(name: "stripe_price_id")
@@ -79,6 +75,7 @@ model Monitor {
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs      PingLog[] 
+  incidents Incident[] // NEW: Relation to Incidents
 
   @@index([userId])
 }
@@ -89,9 +86,21 @@ model PingLog {
   ping      Int
   status    String
   createdAt DateTime @default(now())
-
   monitor   Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  @@index([monitorId])
+}
 
+// NEW: The Incident Tracking Table
+model Incident {
+  id          String    @id @default(cuid())
+  monitorId   String
+  status      String    @default("Ongoing") // Ongoing or Resolved
+  error       String?
+  startedAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+  duration    Int?      // Stored in minutes
+  
+  monitor     Monitor   @relation(fields: [monitorId], references: [id], onDelete: Cascade)
   @@index([monitorId])
 }
 
@@ -102,8 +111,6 @@ model ApiKey {
   key       String   @unique
   createdAt DateTime @default(now())
   lastUsed  DateTime?
-
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@index([userId])
 }
