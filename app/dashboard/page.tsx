@@ -1,15 +1,14 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { addMonitor, deleteMonitor } from "./actions";
+import { addMonitor, deleteMonitor, forceSweep } from "./actions";
 import { TelemetryChart } from "./TelemetryChart";
-import { Activity, Trash2, Globe } from "lucide-react";
+import { Activity, Trash2, Globe, Zap } from "lucide-react";
 import { format } from "date-fns";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   
-  // Fetch monitors AND their last 20 historical logs
   const monitors = await prisma.monitor.findMany({
     where: { userId: session?.user?.id },
     orderBy: { createdAt: 'desc' },
@@ -80,7 +79,17 @@ export default async function DashboardPage() {
 
       {/* The Telemetry Matrix */}
       <div className="space-y-4">
-        <h3 className="text-lg font-medium text-white px-1">Telemetry Streams</h3>
+        <div className="flex items-center justify-between px-1">
+          <h3 className="text-lg font-medium text-white">Telemetry Streams</h3>
+          
+          {/* THE NEW GLOBAL SWEEP BUTTON */}
+          <form action={forceSweep}>
+            <button type="submit" className="flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 bg-emerald-400/10 hover:bg-emerald-400/20 border border-emerald-400/20 px-3 py-1.5 rounded-md transition-all">
+              <Zap className="w-4 h-4" /> Run Global Sweep
+            </button>
+          </form>
+        </div>
+
         {monitors.length === 0 ? (
           <div className="rounded-xl border border-neutral-800 bg-black/40 p-12 text-center shadow-xl">
             <Globe className="w-12 h-12 text-neutral-800 mx-auto mb-4" />
@@ -89,7 +98,6 @@ export default async function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {monitors.map((service) => {
-              // Format data for the chart
               const chartData = service.logs.map(log => ({
                 time: format(new Date(log.createdAt), 'HH:mm'),
                 ping: log.ping
@@ -119,7 +127,6 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   
-                  {/* The Chart */}
                   <div className="mb-4">
                      <TelemetryChart data={chartData} />
                   </div>
