@@ -1,23 +1,24 @@
 "use client";
 
 import React, { useState, useCallback } from 'react';
-import ReactFlow, { Background, Controls, applyNodeChanges, NodeChange, Edge, addEdge, Connection } from 'reactflow';
+// FIX: We imported 'Node' here to satisfy TypeScript
+import ReactFlow, { Background, Controls, applyNodeChanges, NodeChange, Edge, addEdge, Connection, Node } from 'reactflow';
 import 'reactflow/dist/style.css';
 import StatusNode from './StatusNode';
 
 const nodeTypes = { statusNode: StatusNode };
 
 export default function Canvas({ monitors }: { monitors: any[] }) {
-  // Auto-generate visual nodes from the existing database
-  const initialNodes = monitors.map((m, i) => ({
+  // FIX: Explicitly typed 'initialNodes' as an array of official ReactFlow Nodes
+  const initialNodes: Node[] = monitors.map((m, i) => ({
     id: m.id,
     type: 'statusNode',
-    // Auto-layout them in a neat grid to start
     position: { x: (i % 3) * 320 + 50, y: Math.floor(i / 3) * 200 + 50 },
     data: { name: m.name, url: m.url, status: m.status, ping: m.ping }
   }));
 
-  const [nodes, setNodes] = useState(initialNodes);
+  // FIX: Explicitly typed the state hook
+  const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>([]);
 
   const onNodesChange = useCallback(
