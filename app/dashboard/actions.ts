@@ -28,7 +28,6 @@ export async function addMonitor(formData: FormData) {
     status = "Down";
   }
 
-  // Create the monitor AND its first history log instantly
   const newMonitor = await prisma.monitor.create({
     data: {
       userId: session.user.id,
@@ -59,5 +58,42 @@ export async function deleteMonitor(formData: FormData) {
     where: { id: id, userId: session.user.id },
   });
 
+  revalidatePath("/dashboard");
+}
+
+// NEW: Manual override to ping all endpoints instantly
+export async function forceSweep() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const monitors = await prisma.monitor.findMany({
+    where: { userId: session.user.id }
+  });
+
+  const promises = monitors.map(async (monitor) => {
+    const startTime = Date.now();
+    let status = "Down";
+    let ping = 0;
+
+    try {
+      const response = await fetch(monitor.url, { method: 'GET', cache: 'no-store' });
+      ping = Date.now() - startTime;
+      status = response.ok ? "Operational" : "Degraded";
+    } catch (error) {
+      ping = Date.now() - startTime;
+      status = "Down";
+    }
+
+    await prisma.monitor.update({
+      where: { id: monitor.id },
+      data: { status, ping, lastCheck: new Date(), uptime: status === 'Operational' ? 100 : 0 }
+    });
+
+    await prisma.pingLog.create({
+      data: { monitorId: monitor.id, ping, status }
+    });
+  });
+
+  await Promise.all(promises);
   revalidatePath("/dashboard");
 }
