@@ -54,6 +54,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   monitors      Monitor[]
+  apiKeys       ApiKey[]  // NEW: Relation to API Keys
 }
 
 model Monitor {
@@ -71,12 +72,11 @@ model Monitor {
   updatedAt DateTime  @updatedAt
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs      PingLog[] // Relation to historical logs
+  logs      PingLog[] 
 
   @@index([userId])
 }
 
-// NEW: Time-series tracking for our charts
 model PingLog {
   id        String   @id @default(cuid())
   monitorId String
@@ -87,4 +87,18 @@ model PingLog {
   monitor   Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
 
   @@index([monitorId])
+}
+
+// NEW: API Key Storage for programmatic access
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String   // e.g., "GitHub Actions CI"
+  key       String   @unique
+  createdAt DateTime @default(now())
+  lastUsed  DateTime?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
