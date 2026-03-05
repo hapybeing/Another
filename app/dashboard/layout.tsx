@@ -8,7 +8,6 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // The Security Gate: Check if user is authenticated
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -38,10 +37,10 @@ export default async function DashboardLayout({
         </div>
 
         <nav className="space-y-2">
-          <Link href="/dashboard" className="block rounded-md bg-neutral-800/50 px-3 py-2 text-sm font-medium text-white transition-colors">Overview</Link>
-          <Link href="#" className="block rounded-md px-3 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-800/50 hover:text-white transition-colors">Endpoints</Link>
-          <Link href="#" className="block rounded-md px-3 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-800/50 hover:text-white transition-colors">Alerts</Link>
-          <Link href="#" className="block rounded-md px-3 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-800/50 hover:text-white transition-colors">Settings</Link>
+          <Link href="/dashboard" className="block rounded-md px-3 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-800/50 hover:text-white transition-colors">Overview</Link>
+          <Link href="/dashboard/endpoints" className="block rounded-md px-3 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-800/50 hover:text-white transition-colors">Endpoints</Link>
+          <Link href="/dashboard/alerts" className="block rounded-md px-3 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-800/50 hover:text-white transition-colors">Alerts</Link>
+          <Link href="/dashboard/settings" className="block rounded-md px-3 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-800/50 hover:text-white transition-colors">Settings</Link>
         </nav>
       </div>
 
