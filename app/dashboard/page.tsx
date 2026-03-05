@@ -1,18 +1,16 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { addMonitor } from "./actions";
+import { addMonitor, deleteMonitor } from "./actions";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   
-  // Fetch only the monitors belonging to the logged-in user
   const monitors = await prisma.monitor.findMany({
     where: { userId: session?.user?.id },
     orderBy: { createdAt: 'desc' }
   });
 
-  // Calculate live stats
   const totalMonitors = monitors.length;
   const healthyMonitors = monitors.filter(m => m.status === 'Operational').length;
   const avgPing = totalMonitors > 0 
@@ -35,7 +33,7 @@ export default async function DashboardPage() {
               ) : totalMonitors === 0 ? (
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-neutral-500"></span>
               ) : (
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
               )}
             </span>
             <p className="text-2xl font-semibold text-white">
@@ -59,11 +57,11 @@ export default async function DashboardPage() {
         <form action={addMonitor} className="flex flex-col sm:flex-row gap-4 sm:items-end">
           <div className="flex-1">
             <label htmlFor="name" className="block text-sm font-medium text-neutral-400 mb-1">Service Name</label>
-            <input type="text" id="name" name="name" required placeholder="e.g., Auth API Gateway" className="w-full rounded-md border border-neutral-800 bg-neutral-900/50 px-4 py-2 text-white placeholder-neutral-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all" />
+            <input type="text" id="name" name="name" required placeholder="e.g., GitHub Public API" className="w-full rounded-md border border-neutral-800 bg-neutral-900/50 px-4 py-2 text-white placeholder-neutral-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all" />
           </div>
           <div className="flex-1">
             <label htmlFor="url" className="block text-sm font-medium text-neutral-400 mb-1">Target URL</label>
-            <input type="url" id="url" name="url" required placeholder="https://api.example.com/health" className="w-full rounded-md border border-neutral-800 bg-neutral-900/50 px-4 py-2 text-white placeholder-neutral-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all" />
+            <input type="url" id="url" name="url" required placeholder="https://api.github.com" className="w-full rounded-md border border-neutral-800 bg-neutral-900/50 px-4 py-2 text-white placeholder-neutral-600 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all" />
           </div>
           <button type="submit" className="rounded-md bg-white px-8 py-2.5 text-sm font-semibold text-black shadow-sm hover:bg-neutral-200 transition-all mt-4 sm:mt-0">
             Deploy Monitor
@@ -92,7 +90,7 @@ export default async function DashboardPage() {
                   <p className="font-medium text-white">{service.name}</p>
                   <p className="text-sm text-neutral-500">{service.url}</p>
                 </div>
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-6">
                   <div className="text-right hidden sm:block">
                     <p className="text-sm text-neutral-400">Uptime</p>
                     <p className="text-sm font-medium text-white">{service.uptime}%</p>
@@ -105,11 +103,22 @@ export default async function DashboardPage() {
                     <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                       service.status === 'Operational' 
                         ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20' 
-                        : 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20'
+                        : 'bg-red-400/10 text-red-400 border border-red-400/20'
                     }`}>
                       {service.status}
                     </span>
                   </div>
+                  
+                  {/* Delete Button Form */}
+                  <form action={deleteMonitor}>
+                    <input type="hidden" name="id" value={service.id} />
+                    <button type="submit" className="p-2 text-neutral-500 hover:text-red-500 hover:bg-red-500/10 rounded-md transition-all" title="Delete Monitor">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </form>
+
                 </div>
               </div>
             ))
