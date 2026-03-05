@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black bg-grid-pattern">
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 pt-32 pb-16 lg:px-8 bg-grid-pattern">
       {/* Top Navigation Bar */}
       <header className="absolute top-0 w-full z-50 flex items-center justify-between px-6 py-5 lg:px-8 border-b border-neutral-800/50 bg-black/40 backdrop-blur-md">
         <div className="flex items-center gap-2">
@@ -22,7 +22,7 @@ export default function Home() {
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-neutral-900/40 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="relative z-10 mx-auto max-w-2xl text-center mt-16 px-6">
+      <div className="relative z-10 mx-auto max-w-2xl text-center mt-12">
         <div className="mb-8 inline-flex items-center rounded-full border border-neutral-800 bg-neutral-900/50 px-3 py-1 text-sm font-medium text-neutral-300 backdrop-blur-sm">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
           Specter v1.0 is currently in alpha
