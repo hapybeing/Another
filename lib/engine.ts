@@ -18,8 +18,8 @@ export async function executePing(monitor: any) {
 
   const previousStatus = monitor.status;
 
-  // 2. STATE MACHINE: Did the server just crash? (UP -> DOWN)
-  if ((currentStatus === "Down" || currentStatus === "Degraded") && previousStatus === "Operational") {
+  // 2. STATE MACHINE FIX: Did the server crash (UP -> DOWN) OR fail on creation (PENDING -> DOWN)?
+  if ((currentStatus === "Down" || currentStatus === "Degraded") && (previousStatus === "Operational" || previousStatus === "Pending")) {
     await prisma.incident.create({
       data: {
         monitorId: monitor.id,
