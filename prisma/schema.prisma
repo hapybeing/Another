@@ -48,11 +48,6 @@ model User {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   
-  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
-  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
-  stripePriceId          String?   @map(name: "stripe_price_id")
-  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
-  
   accounts               Account[]
   sessions               Session[]
   monitors               Monitor[]
@@ -75,7 +70,7 @@ model Monitor {
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs      PingLog[] 
-  incidents Incident[] // NEW: Relation to Incidents
+  incidents Incident[] 
 
   @@index([userId])
 }
@@ -90,15 +85,15 @@ model PingLog {
   @@index([monitorId])
 }
 
-// NEW: The Incident Tracking Table
+// The Incident Tracking Table
 model Incident {
   id          String    @id @default(cuid())
   monitorId   String
-  status      String    @default("Ongoing") // Ongoing or Resolved
+  status      String    @default("Ongoing") 
   error       String?
   startedAt   DateTime  @default(now())
   resolvedAt  DateTime?
-  duration    Int?      // Stored in minutes
+  duration    Int?      
   
   monitor     Monitor   @relation(fields: [monitorId], references: [id], onDelete: Cascade)
   @@index([monitorId])
