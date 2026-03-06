@@ -1,38 +1,59 @@
 import { Handle, Position } from 'reactflow';
-import { Activity, ServerCrash } from 'lucide-react';
+import { Activity, ServerCrash, GripHorizontal } from 'lucide-react';
 
 export default function StatusNode({ data }: { data: any }) {
   const isUp = data.status === 'Operational';
   
   return (
-    <div className={`px-4 py-3 rounded-xl border backdrop-blur-md bg-black/90 w-64 shadow-2xl transition-all ${
-      isUp ? 'border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
+    <div className={`group px-5 py-4 rounded-2xl border backdrop-blur-xl bg-gradient-to-b from-neutral-900/90 to-black/95 w-72 transition-all duration-300 hover:scale-[1.02] ${
+      isUp ? 'border-emerald-500/20 hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]' : 'border-red-500/30 hover:border-red-500/60 hover:shadow-[0_0_40px_rgba(239,68,68,0.25)]'
     }`}>
-      {/* Top Connection Point */}
-      <Handle type="target" position={Position.Top} className="w-2 h-2 bg-neutral-500 border-none" />
+      {/* Massive, glowing top handle for easy connections */}
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        className={`w-5 h-5 border-4 border-black transition-all ${isUp ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]' : 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.8)]'}`} 
+      />
       
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="text-white font-medium truncate pr-2">{data.name}</h3>
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-white/5 text-white/30 group-hover:text-white/80 transition-colors cursor-grab">
+            <GripHorizontal className="w-4 h-4" />
+          </div>
+          <h3 className="text-white font-semibold text-lg tracking-tight truncate pr-2">{data.name}</h3>
+        </div>
         {isUp ? (
-          <Activity className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="p-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <Activity className="w-4 h-4 text-emerald-400 shrink-0" />
+          </div>
         ) : (
-          <ServerCrash className="w-4 h-4 text-red-400 animate-pulse shrink-0" />
+          <div className="p-1.5 rounded-full bg-red-500/10 border border-red-500/20">
+            <ServerCrash className="w-4 h-4 text-red-400 animate-pulse shrink-0" />
+          </div>
         )}
       </div>
       
-      <p className="text-xs text-neutral-500 font-mono truncate">{data.url}</p>
+      <div className="bg-black/50 rounded-lg p-2.5 border border-white/5 mb-3">
+         <p className="text-xs text-neutral-400 font-mono truncate">{data.url}</p>
+      </div>
       
-      <div className="mt-3 flex justify-between items-center border-t border-neutral-800/50 pt-2">
-        <span className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${
-          isUp ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+      <div className="flex justify-between items-center">
+        <span className={`text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-md ${
+          isUp ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse'
         }`}>
           {data.status}
         </span>
-        <span className="text-xs text-neutral-400">{data.ping}ms</span>
+        <span className="text-sm font-medium text-white flex items-center gap-1">
+          {data.ping}<span className="text-xs text-neutral-500">ms</span>
+        </span>
       </div>
 
-      {/* Bottom Connection Point */}
-      <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-neutral-500 border-none" />
+      {/* Massive, glowing bottom handle with hover expansion */}
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        className={`w-5 h-5 border-4 border-black transition-all hover:scale-150 cursor-crosshair ${isUp ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]' : 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.8)]'}`} 
+      />
     </div>
   );
 }
