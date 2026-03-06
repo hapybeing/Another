@@ -7,7 +7,6 @@ import { Network } from "lucide-react";
 export default async function EndpointsPage() {
   const session = await getServerSession(authOptions);
   
-  // Fetch the latest state of all monitors
   const monitors = await prisma.monitor.findMany({
     where: { userId: session?.user?.id },
     orderBy: { createdAt: 'desc' }
@@ -22,6 +21,16 @@ export default async function EndpointsPage() {
             Visual Architecture
           </h1>
           <p className="text-neutral-400 text-sm mt-1">Map your infrastructure topology to instantly visualize cascading failures.</p>
+        </div>
+        
+        {/* PREMIUM ANIMATED BUTTON UI */}
+        <div className="flex gap-3">
+          <button className="relative inline-flex h-10 overflow-hidden rounded-lg p-[1px] focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-black transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+            <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#000000_0%,#10b981_50%,#000000_100%)]" />
+            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-lg bg-neutral-950 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-neutral-900 gap-2">
+              Save Architecture
+            </span>
+          </button>
         </div>
       </div>
 
